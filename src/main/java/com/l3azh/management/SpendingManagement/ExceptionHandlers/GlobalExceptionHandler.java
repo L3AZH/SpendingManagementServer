@@ -2,6 +2,7 @@ package com.l3azh.management.SpendingManagement.ExceptionHandlers;
 
 import com.l3azh.management.SpendingManagement.Dtos.BaseResponseDto;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountAlreadyExistException;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,16 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler {
      * @param e
      * @return
      */
+
+    @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<BaseResponseDto<String>> handleBadCredentialsException(BadCredentialsException e) {
+        BaseResponseDto<String> errorResponse =
+                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, "Email or Password not correct !");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponseDto<String>> handleServerException(Exception e){
@@ -55,6 +66,12 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler {
                 new BaseResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Internal Server Error");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Account Exception
+     * @param e
+     * @return
+     */
 
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -66,11 +83,9 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<BaseResponseDto<String>> handleBadCredentialsException(BadCredentialsException e) {
+    public ResponseEntity<BaseResponseDto<String>> handleAccountWithEmailNotFound(AccountWithEmailNotFoundException e) {
         BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, "Email or Password not correct !");
+                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

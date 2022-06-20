@@ -1,13 +1,12 @@
 package com.l3azh.management.SpendingManagement.Services;
 
 import com.l3azh.management.SpendingManagement.DAOS.IAccountDao;
-import com.l3azh.management.SpendingManagement.Dtos.BaseResponseDto;
-import com.l3azh.management.SpendingManagement.Dtos.CreateAccountRequestDto;
-import com.l3azh.management.SpendingManagement.Dtos.CreateAccountResponseDto;
-import com.l3azh.management.SpendingManagement.Dtos.LoginRequestDto;
+import com.l3azh.management.SpendingManagement.Dtos.*;
 import com.l3azh.management.SpendingManagement.Entities.AccountEntity;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountAlreadyExistException;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
 import com.l3azh.management.SpendingManagement.Repositories.IAccountRepository;
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -75,5 +74,25 @@ public class AccountService implements IAccountDao {
                 HttpStatus.OK.value(),
                 true,
                 new CreateAccountResponseDto("Create account successful !"));
+    }
+
+    @Override
+    public BaseResponseDto<InfoAccountResponseDto> getAccountInfo(String email) throws AccountWithEmailNotFoundException {
+        Optional<AccountEntity> result = accountRepository.findById(email);
+        AccountEntity accountInfo = null;
+        if(result.isEmpty()){
+            throw new AccountWithEmailNotFoundException("Can not found any account with this email: " + email);
+        }
+        accountInfo = result.get();
+        return new BaseResponseDto<InfoAccountResponseDto>(
+                HttpStatus.OK.value(),
+                true,
+                new InfoAccountResponseDto(
+                        accountInfo.getEmail(),
+                        accountInfo.getFirstName(),
+                        accountInfo.getLastName(),
+                        accountInfo.getPhonenumber(),
+                        AppUtils.convertByteToBase64String(accountInfo.getAvatarPic())
+                ));
     }
 }
