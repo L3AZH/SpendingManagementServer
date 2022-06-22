@@ -34,26 +34,26 @@ public class AccountService implements IAccountDao {
          * Check email exist in db
          */
         Optional<AccountEntity> accountExist = accountRepository.findById(requestDto.getEmail());
-        if(accountExist.isPresent()){
+        if (accountExist.isPresent()) {
             throw new AccountAlreadyExistException("Account with this email already exist in database !");
         }
         /**
          * Check if user request an avatar
          */
         byte[] avatar = null;
-        if(requestDto.getAvatar() != null){
-            if(requestDto.getAvatar().length() > 0){
+        if (requestDto.getAvatar() != null) {
+            if (requestDto.getAvatar().length() > 0) {
                 avatar = Base64.getDecoder().decode(requestDto.getAvatar());
             }
         }
         /**
          * Create new account
          */
-        String passwordEncode =  applicationContext.getBean(
+        String passwordEncode = applicationContext.getBean(
                 "passwordEncoder",
                 BCryptPasswordEncoder.class).encode(requestDto.getPassword());
         AccountEntity newAccount;
-        if(avatar != null && avatar.length > 0) {
+        if (avatar != null && avatar.length > 0) {
             newAccount = new AccountEntity(
                     requestDto.getEmail(),
                     passwordEncode,
@@ -80,7 +80,7 @@ public class AccountService implements IAccountDao {
     public BaseResponseDto<InfoAccountResponseDto> getAccountInfo(String email) throws AccountWithEmailNotFoundException {
         Optional<AccountEntity> result = accountRepository.findById(email);
         AccountEntity accountInfo = null;
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             throw new AccountWithEmailNotFoundException("Can not found any account with this email: " + email);
         }
         accountInfo = result.get();
@@ -92,7 +92,30 @@ public class AccountService implements IAccountDao {
                         accountInfo.getFirstName(),
                         accountInfo.getLastName(),
                         accountInfo.getPhonenumber(),
-                        AppUtils.convertByteToBase64String(accountInfo.getAvatarPic())
+                        accountInfo.getAvatarPic() == null ?
+                                "":AppUtils.convertByteToBase64String(accountInfo.getAvatarPic())
                 ));
+    }
+
+    @Override
+    @Transactional
+    public BaseResponseDto<UpdateAccountResponseDto> updateAccountInfo(String email, UpdateAccountRequestDto requestDto) throws AccountWithEmailNotFoundException {
+        Optional<AccountEntity> result = accountRepository.findById(email);
+        AccountEntity accountInfo = null;
+        if (result.isEmpty()) {
+            throw new AccountWithEmailNotFoundException("Can not found any account with this email: " + email);
+        }
+        accountInfo = result.get();
+        accountInfo.setFirstName(requestDto.getFirstName());
+        accountInfo.setLastName(requestDto.getLastName());
+        accountInfo.setPhonenumber(requestDto.getPhonenumber());
+        accountInfo.setAvatarPic(AppUtils.convertStringBase64ToByteArray(requestDto.getAvatar()));
+        accountRepository.save(accountInfo);
+
+        return new BaseResponseDto<>(
+                HttpStatus.OK.value(),
+                true,
+                new UpdateAccountResponseDto("Update account successful !")
+        );
     }
 }

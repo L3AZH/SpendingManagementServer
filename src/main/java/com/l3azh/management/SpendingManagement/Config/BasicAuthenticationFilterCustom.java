@@ -1,5 +1,6 @@
 package com.l3azh.management.SpendingManagement.Config;
 
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,16 +54,16 @@ public class BasicAuthenticationFilterCustom extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    filterChain.doFilter(request, response);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+                    AppUtils.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+                    return;
                 }
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
             }
+            filterChain.doFilter(request, response);
         } catch (Exception e){
             basicAuthFilterLogger.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error !!");
+            AppUtils.sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    String.format("Cannot set user authentication : \n %s", e.getMessage()));
         }
     }
 

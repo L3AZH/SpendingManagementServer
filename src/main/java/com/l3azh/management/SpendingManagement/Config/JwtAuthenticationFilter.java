@@ -1,6 +1,7 @@
 package com.l3azh.management.SpendingManagement.Config;
 
 import com.l3azh.management.SpendingManagement.Services.UserDetailImplService;
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import com.l3azh.management.SpendingManagement.Utils.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +39,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                filterChain.doFilter(request, response);
             } else if (jwt != null && !jwtUtil.validateJwtToken(jwt)) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
-            } else {
-                filterChain.doFilter(request, response);
+                AppUtils.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+                return;
             }
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             jwtAuthFilterLogger.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error !!");
+            AppUtils.sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    String.format("Cannot set user authentication : \n %s", e.getMessage()));
         }
     }
 

@@ -32,7 +32,7 @@ public class JwtUtil {
     }
 
     public Claims getClaimFromJwt(String token) {
-        return Jwts.parser().setSigningKey(jwtCredential).parseClaimsJwt(token).getBody();
+        return Jwts.parser().setSigningKey(jwtCredential).parseClaimsJws(token).getBody();
     }
 
     public Boolean isTokenExpired(Claims token) {
@@ -49,7 +49,7 @@ public class JwtUtil {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(authToken).parseClaimsJwt(authToken);
+            Jwts.parser().setSigningKey(jwtCredential).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException |
                  MalformedJwtException |

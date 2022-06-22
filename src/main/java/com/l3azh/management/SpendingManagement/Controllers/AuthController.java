@@ -1,8 +1,8 @@
 package com.l3azh.management.SpendingManagement.Controllers;
 
+import com.l3azh.management.SpendingManagement.DAOS.IAccountDao;
 import com.l3azh.management.SpendingManagement.Dtos.*;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountAlreadyExistException;
-import com.l3azh.management.SpendingManagement.Services.AccountService;
 import com.l3azh.management.SpendingManagement.Utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,13 +27,11 @@ public class AuthController {
     JwtUtil jwtUtil;
 
     @Autowired
-    AccountService accountService;
+    IAccountDao accountDao;
 
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @PostMapping(value = "/login")
     public ResponseEntity<BaseResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto){
@@ -50,7 +47,7 @@ public class AuthController {
     @PostMapping(value = "/signup")
     public ResponseEntity<BaseResponseDto<CreateAccountResponseDto>> createNewAccount(
             @Valid @RequestBody CreateAccountRequestDto requestDto) throws AccountAlreadyExistException {
-        BaseResponseDto<CreateAccountResponseDto> response = accountService.createNewAccount(requestDto);
-        return new ResponseEntity<BaseResponseDto<CreateAccountResponseDto>>(response, HttpStatus.OK);
+        BaseResponseDto<CreateAccountResponseDto> response = accountDao.createNewAccount(requestDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

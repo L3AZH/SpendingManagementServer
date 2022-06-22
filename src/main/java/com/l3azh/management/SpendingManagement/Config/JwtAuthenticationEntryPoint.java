@@ -1,5 +1,6 @@
 package com.l3azh.management.SpendingManagement.Config;
 
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -19,6 +20,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         jwtAuthEntryPoint.error(String.format("Unauthorized Error {} \n %s",authException.getMessage()));
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Error Unauthorized");
+        AppUtils.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
 }

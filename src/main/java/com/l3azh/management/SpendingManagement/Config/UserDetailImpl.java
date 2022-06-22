@@ -57,6 +57,18 @@ public class UserDetailImpl implements UserDetails {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     @Override
     public String getPassword() {
         return password;
@@ -64,7 +76,7 @@ public class UserDetailImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return String.format("%s-%s", firstName, lastName);
+        return getEmail();
     }
 
     @Override

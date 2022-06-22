@@ -33,10 +33,8 @@ public class BasicAuthSecurityConfig {
         config.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(basicAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                .antMatchers("/api/auth/**").authenticated()
-                .anyRequest().permitAll()
-                .and().httpBasic();
+                .antMatcher("/api/auth/**").authorizeRequests()
+                .anyRequest().authenticated().and().httpBasic();
         config.addFilterBefore(basicAuthenticationFilterCustom, BasicAuthenticationFilter.class);
         return config.build();
     }
