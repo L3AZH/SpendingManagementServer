@@ -1,8 +1,10 @@
 package com.l3azh.management.SpendingManagement.Entities;
 
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -36,12 +38,20 @@ public class WalletEntity {
     @OneToMany(mappedBy = "walletOfTransaction")
     private List<TransactionEntity> listTransaction;
 
-    public WalletEntity() {}
+    public WalletEntity() {
+    }
+
+    public WalletEntity(String name, String description, AccountEntity account) {
+        this.name = name;
+        this.description = description == null ? "" : description;
+        this.account = account;
+        this.createDate = new Date();
+    }
 
     public WalletEntity(UUID uuidWallet, String name, String description, Date createDate, AccountEntity account) {
         this.uuidWallet = uuidWallet;
         this.name = name;
-        this.description = description;
+        this.description = description == null ? "" : description;
         this.createDate = createDate;
         this.account = account;
     }

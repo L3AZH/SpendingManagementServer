@@ -1,7 +1,8 @@
 package com.l3azh.management.SpendingManagement.Dtos;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.l3azh.management.SpendingManagement.Utils.AppUtils;
+
+
 
 public class ErrorResponseDto {
     private int code;
@@ -13,8 +14,7 @@ public class ErrorResponseDto {
         this.code = code;
         this.flag = flag;
         this.errorMessage = errorMessage;
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        this.timeStamp = df.format(new Date());
+        this.timeStamp = AppUtils.getCurrentDateString();
     }
 
     public int getCode() {
