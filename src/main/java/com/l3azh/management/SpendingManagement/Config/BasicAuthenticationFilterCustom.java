@@ -1,9 +1,8 @@
 package com.l3azh.management.SpendingManagement.Config;
 
 import com.l3azh.management.SpendingManagement.Utils.AppUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,12 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class BasicAuthenticationFilterCustom extends OncePerRequestFilter {
 
-    private static Logger basicAuthFilterLogger = LoggerFactory.getLogger(BasicAuthenticationFilterCustom.class.getName());
-
-    @Autowired
-    ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     @Value("${basic.auth.name}")
     private String username;
@@ -61,7 +59,7 @@ public class BasicAuthenticationFilterCustom extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception e){
-            basicAuthFilterLogger.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
+            log.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
             AppUtils.sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     String.format("Cannot set user authentication : \n %s", e.getMessage()));
         }

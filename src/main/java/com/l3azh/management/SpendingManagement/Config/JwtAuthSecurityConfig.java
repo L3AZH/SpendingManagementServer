@@ -1,13 +1,11 @@
 package com.l3azh.management.SpendingManagement.Config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,16 +16,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @Order(2)
+@RequiredArgsConstructor
 public class JwtAuthSecurityConfig {
 
-    @Autowired
-    JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
-    @Autowired
-    JwtAuthenticationEntryPoint jwtErrorHandler;
+    private final JwtAuthenticationEntryPoint jwtErrorHandler;
 
-    @Autowired
-    @Qualifier("passwordEncoder")
     PasswordEncoder passwordEncoder;
 
     @Bean

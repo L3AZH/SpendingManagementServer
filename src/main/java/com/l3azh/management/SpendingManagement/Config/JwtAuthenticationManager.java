@@ -1,8 +1,8 @@
 package com.l3azh.management.SpendingManagement.Config;
 
 import com.l3azh.management.SpendingManagement.Services.UserDetailImplService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,14 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationManager implements AuthenticationManager {
 
-    @Autowired
-    UserDetailImplService userDetailImplService;
+    private final UserDetailImplService userDetailImplService;
 
-    @Autowired
-    @Qualifier("passwordEncoder")
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

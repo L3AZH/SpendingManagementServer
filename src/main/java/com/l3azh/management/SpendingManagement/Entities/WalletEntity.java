@@ -1,7 +1,10 @@
 package com.l3azh.management.SpendingManagement.Entities;
 
 import com.l3azh.management.SpendingManagement.Utils.AppUtils;
+import lombok.Builder;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
@@ -11,12 +14,15 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "Wallet")
+@Data
+@Builder
 public class WalletEntity {
 
     @Id
+    @Type(type = "uuid-char")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "UUID_wallet")
+    @Column(name = "UUID_wallet", columnDefinition = "VARCHAR(50)")
     private UUID uuidWallet;
 
     @Column(name = "Name")
@@ -38,77 +44,4 @@ public class WalletEntity {
     @OneToMany(mappedBy = "walletOfTransaction")
     private List<TransactionEntity> listTransaction;
 
-    public WalletEntity() {
-    }
-
-    public WalletEntity(String name, String description, AccountEntity account) {
-        this.name = name;
-        this.description = description == null ? "" : description;
-        this.account = account;
-        this.createDate = new Date();
-    }
-
-    public WalletEntity(UUID uuidWallet, String name, String description, Date createDate, AccountEntity account) {
-        this.uuidWallet = uuidWallet;
-        this.name = name;
-        this.description = description == null ? "" : description;
-        this.createDate = createDate;
-        this.account = account;
-    }
-
-    public UUID getUuidWallet() {
-        return uuidWallet;
-    }
-
-    public void setUuidWallet(UUID uuidWallet) {
-        this.uuidWallet = uuidWallet;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public AccountEntity getAccount() {
-        return account;
-    }
-
-    public void setAccount(AccountEntity account) {
-        this.account = account;
-    }
-
-    public List<BudgetEntity> getListBudget() {
-        return listBudget;
-    }
-
-    public void setListBudget(List<BudgetEntity> listBudget) {
-        this.listBudget = listBudget;
-    }
-
-    public List<TransactionEntity> getListTransaction() {
-        return listTransaction;
-    }
-
-    public void setListTransaction(List<TransactionEntity> listTransaction) {
-        this.listTransaction = listTransaction;
-    }
 }

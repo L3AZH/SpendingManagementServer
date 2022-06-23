@@ -1,6 +1,9 @@
 package com.l3azh.management.SpendingManagement.Entities;
 
+import lombok.Builder;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -8,12 +11,15 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "Budget")
+@Data
+@Builder
 public class BudgetEntity {
 
     @Id
+    @Type(type = "uuid-char")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "UUID_budget")
+    @Column(name = "UUID_budget", columnDefinition = "VARCHAR(50)")
     private UUID uuidBudget;
 
     @Column(name = "Name")

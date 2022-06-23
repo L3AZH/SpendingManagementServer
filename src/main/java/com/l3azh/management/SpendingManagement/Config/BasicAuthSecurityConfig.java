@@ -1,13 +1,12 @@
 package com.l3azh.management.SpendingManagement.Config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -15,18 +14,14 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Configuration
 @EnableWebSecurity
 @Order(1)
+@RequiredArgsConstructor
 public class BasicAuthSecurityConfig {
 
-    @Autowired
-    BasicAuthenticationFilterCustom basicAuthenticationFilterCustom;
+    private final BasicAuthenticationFilterCustom basicAuthenticationFilterCustom;
 
-    @Autowired
-    BasicAuthAuthenticationEntryPoint basicAuthenticationEntryPoint;
+    private final BasicAuthAuthenticationEntryPoint basicAuthenticationEntryPoint;
 
-    @Bean(name = "passwordEncoder")
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public SecurityFilterChain basicAuthConfig(HttpSecurity config) throws Exception {

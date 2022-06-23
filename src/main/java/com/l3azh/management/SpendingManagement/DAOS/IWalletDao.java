@@ -5,11 +5,9 @@ import com.l3azh.management.SpendingManagement.Dtos.EntitiesDto.WalletDto;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneWalletFoundWithEmailException;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.WalletWithNameAlreadyExistInDb;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public interface IWalletDao {
     BaseResponseDto<CreateWalletResponseDto> createNewWallet(String email, CreateWalletRequestDto requestDto)
             throws AccountWithEmailNotFoundException, WalletWithNameAlreadyExistInDb;

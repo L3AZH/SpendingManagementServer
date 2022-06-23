@@ -2,8 +2,7 @@ package com.l3azh.management.SpendingManagement.Utils;
 
 import com.l3azh.management.SpendingManagement.Config.UserDetailImpl;
 import io.jsonwebtoken.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -11,9 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtUtil {
-
-    private static Logger jwtLog = LoggerFactory.getLogger(JwtUtil.class.getName());
 
     @Value("${jwt.credential}")
     private String jwtCredential;
@@ -56,9 +54,9 @@ public class JwtUtil {
                  ExpiredJwtException |
                  UnsupportedJwtException |
                  IllegalArgumentException e) {
-            jwtLog.error(e.getMessage());
+            log.error(e.getMessage());
         } catch (Exception e) {
-            jwtLog.error(e.getMessage());
+            log.error(e.getMessage());
         }
         return false;
     }

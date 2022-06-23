@@ -3,9 +3,8 @@ package com.l3azh.management.SpendingManagement.Config;
 import com.l3azh.management.SpendingManagement.Services.UserDetailImplService;
 import com.l3azh.management.SpendingManagement.Utils.AppUtils;
 import com.l3azh.management.SpendingManagement.Utils.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,15 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static Logger jwtAuthFilterLogger = LoggerFactory.getLogger(JwtAuthenticationFilter.class.getName());
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    UserDetailImplService userDetailImplService;
+    private final UserDetailImplService userDetailImplService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -45,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            jwtAuthFilterLogger.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
+            log.error(String.format("Cannot set user authentication : \n %s", e.getMessage()));
             AppUtils.sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     String.format("Cannot set user authentication : \n %s", e.getMessage()));
         }

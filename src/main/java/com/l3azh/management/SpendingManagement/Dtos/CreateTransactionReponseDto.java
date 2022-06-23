@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UpdateWalletResponseDto {
+public class CreateTransactionReponseDto {
     private String message;
 }

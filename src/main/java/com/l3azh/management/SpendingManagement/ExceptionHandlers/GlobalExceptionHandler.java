@@ -1,51 +1,52 @@
 package com.l3azh.management.SpendingManagement.ExceptionHandlers;
 
-import com.l3azh.management.SpendingManagement.Dtos.BaseResponseDto;
-import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountAlreadyExistException;
-import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
-import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneWalletFoundWithEmailException;
-import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.WalletWithNameAlreadyExistInDb;
+import com.l3azh.management.SpendingManagement.Dtos.ErrorResponseDto;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ControllerAdvice
-public class GlobalExceptionHandler implements IAccountExceptionHandler, IWalletExceptionHandler {
-
-    private static final Logger exceptionLog = LoggerFactory.getLogger(GlobalExceptionHandler.class.getName());
+@Slf4j
+public class GlobalExceptionHandler implements IAccountExceptionHandler, IWalletExceptionHandler, ITransactionExceptionHandler, ITransTypeExceptionHandler {
 
     /**
      * Valid field request exception handler
+     *
      * @param ex
      * @return
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponseDto<Map<String, String>>> handleValidationExceptions(
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        String errorMessageResponse = "None";
+        if (ex.getBindingResult().getAllErrors().size() > 0) {
+            ObjectError error = ex.getBindingResult().getAllErrors().get(0);
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        BaseResponseDto<Map<String, String>> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, errors);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            errorMessageResponse = fieldName + " - " + errorMessage;
+        }
+        return new ResponseEntity<>(
+                ErrorResponseDto.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .flag(false)
+                        .errorMessage(errorMessageResponse)
+                        .build(), HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Handle General Exception for Server
+     *
      * @param e
      * @return
      */
@@ -53,24 +54,29 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<BaseResponseDto<String>> handleBadCredentialsException(BadCredentialsException e) {
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, "Email or Password not correct !");
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleBadCredentialsException(BadCredentialsException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage("Email or Password not correct !")
+                .build(), HttpStatus.BAD_REQUEST);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponseDto<String>> handleServerException(Exception e){
-        exceptionLog.error(e.getMessage());
+    public ResponseEntity<ErrorResponseDto> handleServerException(Exception e) {
+        log.error(e.getMessage());
         e.printStackTrace();
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Internal Server Error");
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .flag(false)
+                .errorMessage("Internal Server Error: " + e.getMessage())
+                .build(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
      * Account Exception
+     *
      * @param e
      * @return
      */
@@ -78,19 +84,23 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AccountAlreadyExistException.class)
-    public ResponseEntity<BaseResponseDto<String>> handleAccountAlreadyExistException(AccountAlreadyExistException e) {
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleAccountAlreadyExistException(AccountAlreadyExistException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AccountWithEmailNotFoundException.class)
-    public ResponseEntity<BaseResponseDto<String>> handleAccountWithEmailNotFound(AccountWithEmailNotFoundException e) {
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleAccountWithEmailNotFound(AccountWithEmailNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -100,18 +110,73 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(WalletWithNameAlreadyExistInDb.class)
-    public ResponseEntity<BaseResponseDto<String>> handleWalletWithNameAlreadyExistInDbException(WalletWithNameAlreadyExistInDb e) {
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleWalletWithNameAlreadyExistInDbException(WalletWithNameAlreadyExistInDb e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoneWalletFoundWithEmailException.class)
-    public ResponseEntity<BaseResponseDto<String>> handleNoneWalletWithEmailException(NoneWalletFoundWithEmailException e) {
-        BaseResponseDto<String> errorResponse =
-                new BaseResponseDto<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDto> handleNoneWalletWithEmailException(NoneWalletFoundWithEmailException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneWalletFoundWithUUIDException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoneWalletFoundWithUUIDException(NoneWalletFoundWithUUIDException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * TransType Exception
+     */
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneTransTypeFoundWithUUIDException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoneTransTypeFoundWithUUIDException(NoneTransTypeFoundWithUUIDException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Transaction Exception
+     */
+
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneTransactionFoundWithUUIDException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoneTransactionFoundWithUUIDException(NoneTransactionFoundWithUUIDException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneTransactionFoundWithUUIDWalletException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoneTransactionFoundWithUUIDWalletException(NoneTransactionFoundWithUUIDWalletException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
     }
 }

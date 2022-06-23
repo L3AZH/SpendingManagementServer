@@ -10,8 +10,8 @@ import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.Non
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.WalletWithNameAlreadyExistInDb;
 import com.l3azh.management.SpendingManagement.Repositories.IAccountRepository;
 import com.l3azh.management.SpendingManagement.Repositories.IWalletRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +21,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class WalletService implements IWalletDao {
 
-    @Autowired
-    IWalletRepository walletRepository;
-    @Autowired
-    IAccountRepository accountRepository;
-    @Autowired
-    ModelMapper modelMapper;
+    private final IWalletRepository walletRepository;
+    private final IAccountRepository accountRepository;
+
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -44,10 +43,15 @@ public class WalletService implements IWalletDao {
             throw new WalletWithNameAlreadyExistInDb("The name wallet you create already exist in db!");
         }
 
-        WalletEntity newWallet = new WalletEntity(requestDto.getName(), requestDto.getDescription(), account);
+        WalletEntity newWallet = WalletEntity.builder()
+                .name(requestDto.getName())
+                .description(requestDto.getDescription())
+                .account(account).build();
         walletRepository.save(newWallet);
-        return new BaseResponseDto<>(
-                HttpStatus.OK.value(), true, new CreateWalletResponseDto("Create new wallet successful !"));
+        return BaseResponseDto.<CreateWalletResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(CreateWalletResponseDto.builder().message("Created wallet successful !").build()).build();
     }
 
     @Override
@@ -63,10 +67,15 @@ public class WalletService implements IWalletDao {
             throw new WalletWithNameAlreadyExistInDb("The name wallet you create already exist in db!");
         }
 
-        WalletEntity newWallet = new WalletEntity(requestDto.getName(), requestDto.getDescription(), account);
-        walletRepository.save(newWallet);
-        return new BaseResponseDto<>(
-                HttpStatus.OK.value(), true, new UpdateWalletResponseDto("Create new wallet successful !"));
+        WalletEntity updateWallet = WalletEntity.builder()
+                .name(requestDto.getName())
+                .description(requestDto.getDescription())
+                .account(account).build();
+        walletRepository.save(updateWallet);
+        return BaseResponseDto.<UpdateWalletResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(UpdateWalletResponseDto.builder().message("Updated wallet successful !").build()).build();
     }
 
     @Override
@@ -85,9 +94,11 @@ public class WalletService implements IWalletDao {
         if(listWalletEntities.size() == 0){
             throw new NoneWalletFoundWithEmailException("Can not found any wallet !");
         }
-        List<WalletDto> listWalletDtos = listWalletEntities.stream().map(walletEntity -> {
-             return modelMapper.map(walletEntity, WalletDto.class);
-        }).collect(Collectors.toList());
-        return new BaseResponseDto<>(HttpStatus.OK.value(), true, listWalletDtos);
+        List<WalletDto> listWalletDtos = listWalletEntities.stream()
+                .map(walletEntity -> modelMapper.map(walletEntity, WalletDto.class)).collect(Collectors.toList());
+        return BaseResponseDto.<List<WalletDto>>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(listWalletDtos).build();
     }
 }

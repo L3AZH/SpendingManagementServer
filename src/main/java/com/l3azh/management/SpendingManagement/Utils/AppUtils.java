@@ -11,15 +11,15 @@ import java.util.Date;
 
 public class AppUtils {
 
-    public static String convertByteToBase64String(byte[] theInputByteArray){
-        return  Base64.getEncoder().encodeToString(theInputByteArray);
+    public static String convertByteToBase64String(byte[] theInputByteArray) {
+        return Base64.getEncoder().encodeToString(theInputByteArray);
     }
 
-    public static byte[] convertStringBase64ToByteArray(String theInputStringEncode){
+    public static byte[] convertStringBase64ToByteArray(String theInputStringEncode) {
         return Base64.getDecoder().decode(theInputStringEncode);
     }
 
-    public static String getCurrentDateString(){
+    public static String getCurrentDateString() {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         return df.format(new Date());
     }
@@ -27,7 +27,10 @@ public class AppUtils {
     public static void sendError(HttpServletResponse response, int code, String message) throws IOException {
         response.setHeader("Content-type", "application/json");
         response.setStatus(code);
-        ErrorResponseDto responseDto = new ErrorResponseDto(code, false, message);
+        ErrorResponseDto responseDto = ErrorResponseDto.builder()
+                .code(code)
+                .flag(false)
+                .errorMessage(message).build();
         response.getWriter().write(new Gson().toJson(responseDto));
     }
 }

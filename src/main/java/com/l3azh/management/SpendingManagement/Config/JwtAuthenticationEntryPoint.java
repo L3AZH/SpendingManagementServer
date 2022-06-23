@@ -1,8 +1,8 @@
 package com.l3azh.management.SpendingManagement.Config;
 
 import com.l3azh.management.SpendingManagement.Utils.AppUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -13,13 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
-    private static Logger jwtAuthEntryPoint = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class.getName());
-
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        jwtAuthEntryPoint.error(String.format("Unauthorized Error {} \n %s",authException.getMessage()));
+        log.error(String.format("Unauthorized Error {} \n %s",authException.getMessage()));
         AppUtils.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
 }

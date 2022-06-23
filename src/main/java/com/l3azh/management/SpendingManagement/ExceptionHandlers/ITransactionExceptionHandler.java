@@ -1,0 +1,11 @@
+package com.l3azh.management.SpendingManagement.ExceptionHandlers;
+
+import com.l3azh.management.SpendingManagement.Dtos.ErrorResponseDto;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneTransactionFoundWithUUIDException;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneTransactionFoundWithUUIDWalletException;
+import org.springframework.http.ResponseEntity;
+
+public interface ITransactionExceptionHandler {
+    ResponseEntity<ErrorResponseDto> handleNoneTransactionFoundWithUUIDException(NoneTransactionFoundWithUUIDException e);
+    ResponseEntity<ErrorResponseDto> handleNoneTransactionFoundWithUUIDWalletException(NoneTransactionFoundWithUUIDWalletException e);
+}

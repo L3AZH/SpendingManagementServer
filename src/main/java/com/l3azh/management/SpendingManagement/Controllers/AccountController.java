@@ -6,7 +6,7 @@ import com.l3azh.management.SpendingManagement.Dtos.InfoAccountResponseDto;
 import com.l3azh.management.SpendingManagement.Dtos.UpdateAccountRequestDto;
 import com.l3azh.management.SpendingManagement.Dtos.UpdateAccountResponseDto;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,10 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/account")
+@RequiredArgsConstructor
 public class AccountController {
 
-    @Autowired
-    IAccountDao accountDao;
+    private final IAccountDao accountDao;
 
     @GetMapping(value = "/info")
     public ResponseEntity<BaseResponseDto<InfoAccountResponseDto>> getInfo(

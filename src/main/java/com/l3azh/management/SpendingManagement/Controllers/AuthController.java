@@ -4,7 +4,7 @@ import com.l3azh.management.SpendingManagement.DAOS.IAccountDao;
 import com.l3azh.management.SpendingManagement.Dtos.*;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountAlreadyExistException;
 import com.l3azh.management.SpendingManagement.Utils.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,27 +21,25 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    IAccountDao accountDao;
+    private final IAccountDao accountDao;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<BaseResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto){
+    public ResponseEntity<BaseResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 requestDto.getEmail(), requestDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtil.generateJwToken(authentication);
-        BaseResponseDto<LoginResponseDto> responseDto =
-                new BaseResponseDto<>(HttpStatus.OK.value(), true, new LoginResponseDto(jwt));
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(BaseResponseDto.<LoginResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(LoginResponseDto.builder().token(jwt).build()).build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/signup")

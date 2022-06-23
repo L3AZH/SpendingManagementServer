@@ -7,7 +7,7 @@ import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.Acc
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
 import com.l3azh.management.SpendingManagement.Repositories.IAccountRepository;
 import com.l3azh.management.SpendingManagement.Utils.AppUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,13 +18,12 @@ import java.util.Base64;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService implements IAccountDao {
 
-    @Autowired
-    IAccountRepository accountRepository;
+    private final IAccountRepository accountRepository;
 
-    @Autowired
-    ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     @Override
     @Transactional
@@ -54,26 +53,26 @@ public class AccountService implements IAccountDao {
                 BCryptPasswordEncoder.class).encode(requestDto.getPassword());
         AccountEntity newAccount;
         if (avatar != null && avatar.length > 0) {
-            newAccount = new AccountEntity(
-                    requestDto.getEmail(),
-                    passwordEncode,
-                    requestDto.getFirstName(),
-                    requestDto.getLastName(),
-                    requestDto.getPhonenumber(),
-                    avatar);
+            newAccount = AccountEntity.builder()
+                    .email(requestDto.getEmail())
+                    .password(passwordEncode)
+                    .firstName(requestDto.getFirstName())
+                    .lastName(requestDto.getLastName())
+                    .phonenumber(requestDto.getPhonenumber())
+                    .avatarPic(avatar).build();
         } else {
-            newAccount = new AccountEntity(
-                    requestDto.getEmail(),
-                    passwordEncode,
-                    requestDto.getFirstName(),
-                    requestDto.getLastName(),
-                    requestDto.getPhonenumber());
+            newAccount = AccountEntity.builder()
+                    .email(requestDto.getEmail())
+                    .password(passwordEncode)
+                    .firstName(requestDto.getFirstName())
+                    .lastName(requestDto.getLastName())
+                    .phonenumber(requestDto.getPhonenumber()).build();
         }
         accountRepository.save(newAccount);
-        return new BaseResponseDto<CreateAccountResponseDto>(
-                HttpStatus.OK.value(),
-                true,
-                new CreateAccountResponseDto("Create account successful !"));
+        return BaseResponseDto.<CreateAccountResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(CreateAccountResponseDto.builder().message("Create account successful !").build()).build();
     }
 
     @Override
@@ -84,17 +83,18 @@ public class AccountService implements IAccountDao {
             throw new AccountWithEmailNotFoundException("Can not found any account with this email: " + email);
         }
         accountInfo = result.get();
-        return new BaseResponseDto<InfoAccountResponseDto>(
-                HttpStatus.OK.value(),
-                true,
-                new InfoAccountResponseDto(
+        return BaseResponseDto.<InfoAccountResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(new InfoAccountResponseDto(
                         accountInfo.getEmail(),
                         accountInfo.getFirstName(),
                         accountInfo.getLastName(),
                         accountInfo.getPhonenumber(),
                         accountInfo.getAvatarPic() == null ?
-                                "":AppUtils.convertByteToBase64String(accountInfo.getAvatarPic())
-                ));
+                                "" : AppUtils.convertByteToBase64String(accountInfo.getAvatarPic())
+                )).build();
+
     }
 
     @Override
@@ -112,10 +112,9 @@ public class AccountService implements IAccountDao {
         accountInfo.setAvatarPic(AppUtils.convertStringBase64ToByteArray(requestDto.getAvatar()));
         accountRepository.save(accountInfo);
 
-        return new BaseResponseDto<>(
-                HttpStatus.OK.value(),
-                true,
-                new UpdateAccountResponseDto("Update account successful !")
-        );
+        return BaseResponseDto.<UpdateAccountResponseDto>builder()
+                .code(HttpStatus.OK.value())
+                .flag(true)
+                .data(UpdateAccountResponseDto.builder().message("Update account successful !").build()).build();
     }
 }

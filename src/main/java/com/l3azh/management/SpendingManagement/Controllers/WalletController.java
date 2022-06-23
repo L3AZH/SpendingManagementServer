@@ -6,7 +6,7 @@ import com.l3azh.management.SpendingManagement.Dtos.EntitiesDto.WalletDto;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.AccountWithEmailNotFoundException;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneWalletFoundWithEmailException;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.WalletWithNameAlreadyExistInDb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +16,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/wallet")
+@RequiredArgsConstructor
 public class WalletController {
 
-    @Autowired
-    IWalletDao iWalletDao;
+    private final IWalletDao iWalletDao;
 
     @PostMapping("/new-wallet")
     public ResponseEntity<BaseResponseDto<CreateWalletResponseDto>> createNewWallet(
@@ -39,7 +39,7 @@ public class WalletController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/get-list-wallet")
+    @GetMapping("/list-wallet")
     public ResponseEntity<BaseResponseDto<List<WalletDto>>> getListWallet(
             @RequestParam String email)
             throws AccountWithEmailNotFoundException, NoneWalletFoundWithEmailException {

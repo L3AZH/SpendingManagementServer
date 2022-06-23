@@ -1,9 +1,14 @@
 package com.l3azh.management.SpendingManagement.Dtos;
 
+import lombok.Builder;
+import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
+@Data
+@Builder
 public class CreateAccountRequestDto {
 
     @Pattern(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+" +
@@ -26,61 +31,4 @@ public class CreateAccountRequestDto {
     @NotBlank(message = "Phonenumber is blank")
     private String phonenumber;
     private String avatar;
-
-    public CreateAccountRequestDto(String email, String password, String firstName, String lastName, String phonenumber, String avatar) {
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phonenumber = phonenumber;
-        this.avatar = avatar;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPhonenumber() {
-        return phonenumber;
-    }
-
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 }
