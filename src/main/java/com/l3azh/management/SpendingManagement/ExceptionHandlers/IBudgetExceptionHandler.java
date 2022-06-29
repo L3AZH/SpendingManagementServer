@@ -1,0 +1,14 @@
+package com.l3azh.management.SpendingManagement.ExceptionHandlers;
+
+
+import com.l3azh.management.SpendingManagement.Dtos.ErrorResponseDto;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.BudgetWithNameAlreadyExistInDbException;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneBudgetFoundWithUUIDException;
+import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.NoneBudgetFoundWithUUIDWalletException;
+import org.springframework.http.ResponseEntity;
+
+public interface IBudgetExceptionHandler {
+    ResponseEntity<ErrorResponseDto> handlerNoneBudgetFoundWithUUIDException(NoneBudgetFoundWithUUIDException e);
+    ResponseEntity<ErrorResponseDto> handlerNoneBudgetFoundWithUUIDWalletException(NoneBudgetFoundWithUUIDWalletException e);
+    ResponseEntity<ErrorResponseDto> handlerBudgetWithNameAlreadyExistInDbException(BudgetWithNameAlreadyExistInDbException e);
+}

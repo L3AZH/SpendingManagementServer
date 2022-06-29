@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @Builder
-public class CreateTransTypeRequestDto {
+public class UpdateTransTypeRequestDto {
     @NotNull(message = "Please enter your wallet name")
     @NotBlank(message = "Name of wallet can not be blank, please enter your wallet name")
     @NotEmpty(message = "Please enter your wallet name")

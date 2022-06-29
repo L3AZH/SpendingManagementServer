@@ -6,6 +6,8 @@ import com.l3azh.management.SpendingManagement.Dtos.ErrorResponseDto;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Date;
 
@@ -21,7 +23,7 @@ public class AppUtils {
 
     public static String getCurrentDateString() {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        return df.format(new Date());
+        return df.format(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)));
     }
 
     public static void sendError(HttpServletResponse response, int code, String message) throws IOException {

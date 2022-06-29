@@ -3,8 +3,6 @@ package com.l3azh.management.SpendingManagement.ExceptionHandlers;
 import com.l3azh.management.SpendingManagement.Dtos.ErrorResponseDto;
 import com.l3azh.management.SpendingManagement.ExceptionHandlers.Expceptions.*;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,13 +15,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler implements IAccountExceptionHandler, IWalletExceptionHandler, ITransactionExceptionHandler, ITransTypeExceptionHandler {
+public class GlobalExceptionHandler implements
+        IAccountExceptionHandler,
+        IWalletExceptionHandler,
+        ITransactionExceptionHandler,
+        IBudgetExceptionHandler,
+        ITransTypeExceptionHandler {
 
     /**
      * Valid field request exception handler
-     *
-     * @param ex
-     * @return
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,9 +46,6 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
 
     /**
      * Handle General Exception for Server
-     *
-     * @param e
-     * @return
      */
 
     @Override
@@ -76,9 +73,6 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
 
     /**
      * Account Exception
-     *
-     * @param e
-     * @return
      */
 
     @Override
@@ -154,6 +148,17 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
                 .build(), HttpStatus.NOT_FOUND);
     }
 
+    @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TransTypeWithNameAlreadyExistInDbException.class)
+    public ResponseEntity<ErrorResponseDto> handleTransTypeWithNameAlreadyExistInDbException(TransTypeWithNameAlreadyExistInDbException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.BAD_REQUEST);
+    }
+
     /**
      * Transaction Exception
      */
@@ -178,5 +183,42 @@ public class GlobalExceptionHandler implements IAccountExceptionHandler, IWallet
                 .flag(false)
                 .errorMessage(e.getMessage())
                 .build(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Budget Exception
+     */
+
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneBudgetFoundWithUUIDException.class)
+    public ResponseEntity<ErrorResponseDto> handlerNoneBudgetFoundWithUUIDException(NoneBudgetFoundWithUUIDException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoneBudgetFoundWithUUIDWalletException.class)
+    public ResponseEntity<ErrorResponseDto> handlerNoneBudgetFoundWithUUIDWalletException(NoneBudgetFoundWithUUIDWalletException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BudgetWithNameAlreadyExistInDbException.class)
+    public ResponseEntity<ErrorResponseDto> handlerBudgetWithNameAlreadyExistInDbException(BudgetWithNameAlreadyExistInDbException e) {
+        return new ResponseEntity<>(ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .flag(false)
+                .errorMessage(e.getMessage())
+                .build(), HttpStatus.BAD_REQUEST);
     }
 }
